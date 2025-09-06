@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NightLife Hub Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#0a0a0a;color:#eee;overflow-x:hidden;}
+button{cursor:pointer;outline:none;border:none;}
+.section{display:none;transition:0.4s all;}
+canvas#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;}
+
+/* HEADER */
+header{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;text-align:center;background:linear-gradient(135deg,#0a0a0a,#111122);}
+header h1{font-size:3rem;font-weight:800;margin-bottom:30px;color:#7ddfff;text-shadow:0 0 12px #7ddfff;animation:float 4s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+header button{padding:14px 30px;font-size:1.2rem;border-radius:50px;background:#7ddfff;color:#0a0a0a;box-shadow:0 0 10px #7ddfff;transition:0.4s all;}
+header button:hover{transform:scale(1.05);box-shadow:0 0 25px #7ddfff;}
+
+/* NAV */
+nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:25px;background:rgba(20,20,20,0.7);padding:10px 25px;border-radius:50px;backdrop-filter:blur(8px);z-index:10;}
+nav button{background:transparent;color:white;font-size:1.3rem;transition:0.3s all;}
+nav button:hover{color:#7ddfff;transform:scale(1.2);}
+
+/* ACCUEIL / FEED */
+.feed-category{margin-bottom:30px;}
+.feed-category h2{color:#7ddfff;margin-bottom:10px;}
+.feed-slider{display:flex;overflow-x:auto;gap:15px;padding-bottom:10px;}
+.feed-slider::-webkit-scrollbar{display:none;}
+.feed-card{min-width:250px;background:rgba(255,255,255,0.05);border-radius:12px;overflow:hidden;cursor:pointer;transition:0.3s all;box-shadow:0 0 6px #7ddfff;}
+.feed-card:hover{transform:scale(1.03);box-shadow:0 0 15px #7ddfff;}
+.feed-card img{width:100%;height:150px;object-fit:cover;}
+.feed-card p{padding:8px;font-size:0.9rem;}
+
+/* SOUVENIRS */
+#souvenirs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;padding-bottom:100px;}
+.souvenir-card{background:rgba(255,255,255,0.05);border-radius:12px;overflow:hidden;transition:0.3s;}
+.souvenir-card:hover{transform:scale(1.03);box-shadow:0 0 12px #7ddfff;}
+.souvenir-card img{width:100%;height:120px;object-fit:cover;}
+.souvenir-card .rating{padding:4px;text-align:center;}
+.souvenir-card .recommend{background:#7ddfff;color:#0a0a0a;padding:4px 8px;border-radius:12px;margin:4px;display:block;text-align:center;cursor:pointer;transition:0.3s;}
+.souvenir-card .recommend:hover{transform:scale(1.05);box-shadow:0 0 10px #7ddfff;}
+
+/* CHAT */
+#chatList{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
+.chat-item{display:flex;align-items:center;padding:10px;border-radius:16px;background:rgba(125,223,255,0.05);cursor:pointer;transition:0.3s;}
+.chat-item:hover{background:rgba(125,223,255,0.15);}
+.chat-item img{width:35px;height:35px;border-radius:50%;margin-right:10px;border:2px solid #7ddfff;}
+#messages{height:200px;overflow-y:auto;display:flex;flex-direction:column;margin-bottom:10px;}
+.message{margin-bottom:8px;padding:10px 14px;border-radius:22px;max-width:70%;animation:slideFade 0.4s;position:relative;}
+.user-msg{align-self:flex-end;background:#7ddfff;color:#0a0a0a;}
+.bot-msg{align-self:flex-start;background:rgba(125,223,255,0.15);color:#eee;}
+#chatInput{padding:10px;border-radius:22px;border:none;width:70%;background:#111122;color:#eee;transition:0.3s;}
+#chatInput:focus{outline:none;box-shadow:0 0 8px #7ddfff;}
+#sendBtn{padding:10px 15px;border-radius:22px;background:#7ddfff;color:#0a0a0a;transition:0.3s;}
+#sendBtn:hover{box-shadow:0 0 15px #7ddfff;}
+@keyframes slideFade{0%{opacity:0;transform:translateY(6px);}100%{opacity:1;transform:translateY(0);}}
+
+/* PROFILE */
+#profile img{width:80px;height:80px;border-radius:50%;border:2px solid #7ddfff;margin-bottom:10px;}
+#profile h2{color:#7ddfff;margin-bottom:5px;}
+#profile .bio{margin-bottom:10px;}
+#profile .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:5px;}
+#profile .gallery img{width:100%;border-radius:8px;transition:0.3s;}
+#profile .gallery img:hover{transform:scale(1.05);box-shadow:0 0 10px #7ddfff;}
+.badge{display:inline-block;padding:4px 10px;margin:4px;background:#7ddfff;border-radius:18px;font-weight:600;box-shadow:0 0 10px #7ddfff;}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<header>
+  <h1>NightLife Hub</h1>
+  <button id="enterBtn">Entrer</button>
+</header>
+
+<div id="app" style="padding:20px;position:relative;z-index:1;display:none;">
+  <nav>
+    <button onclick="showSection('feed')"><i class="fas fa-home"></i></button>
+    <button onclick="showSection('souvenirs')"><i class="fas fa-photo-video"></i></button>
+    <button onclick="showSection('chat')"><i class="fas fa-comment"></i></button>
+    <button onclick="showSection('profile')"><i class="fas fa-user"></i></button>
+  </nav>
+
+  <!-- Sections -->
+  <div id="feed" class="section"></div>
+  <div id="souvenirs" class="section"></div>
+  <div id="chat" class="section">
+    <div id="chatList"></div>
+    <div id="messages"></div>
+    <input type="text" id="chatInput" placeholder="Écrire un message...">
+    <button id="sendBtn">Envoyer</button>
+  </div>
+  <div id="profile" class="section">
+    <img id="profilePic" src="https://via.placeholder.com/80">
+    <h2 id="username">Joueur</h2>
+    <p class="bio">Bio de l'utilisateur</p>
+    <div id="badges"></div>
+    <div class="gallery"></div>
+  </div>
+</div>
+
+<script>
+// PARTICULES
+const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+const particlesArray=[];
+class Particle{constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.size=Math.random()*2+0.5;this.speedX=Math.random()*0.2-0.1;this.speedY=Math.random()*0.2-0.1;this.color='rgba(125,223,255,0.15)';}update(){this.x+=this.speedX;this.y+=this.speedY;if(this.x<0||this.x>canvas.width)this.speedX*=-1;if(this.y<0||this.y>canvas.height)this.speedY*=-1;}draw(){ctx.fillStyle=this.color;ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();}}
+function initParticles(){for(let i=0;i<120;i++){particlesArray.push(new Particle());}}function animateParticles(){ctx.clearRect(0,0,canvas.width,canvas.height);particlesArray.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animateParticles);}
+initParticles();animateParticles();
+
+// ENTER
+const enterBtn=document.getElementById('enterBtn');const app=document.getElementById('app');
+enterBtn.addEventListener('click',()=>{document.querySelector('header').style.display='none';app.style.display='block';showSection('feed');loadFeed();loadSouvenirs();loadChats();loadProfile();});
+
+// NAV
+function showSection(section){document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.getElementById(section).style.display='block';}
+
+// FEED
+const feedContainer=document.getElementById('feed');
+const categories=[
+  {name:"Electro",posts:[{img:"https://images.unsplash.com/photo-1603046891833-449d5cdbf3a5?auto=format&fit=crop&w=400&q=80",desc:"DJ set Electro!"} ]},
+  {name:"House",posts:[{img:"https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2?auto=format&fit=crop&w=400&q=80",desc:"House Party vibes"}]},
+  {name:"Chill",posts:[{img:"https://images.unsplash.com/photo-1517433456452-f9633a875f6f?auto=format&fit=crop&w=400&q=80",desc:"Soirée Chill"}]}
+];
+function loadFeed(){
+  feedContainer.innerHTML="";
+  categories.forEach(cat=>{
+    const catDiv=document.createElement('div');catDiv.classList.add('feed-category');
+    catDiv.innerHTML=`<h2>${cat.name}</h2><div class="feed-slider"></div>`;
+    const slider=catDiv.querySelector('.feed-slider');
+    cat.posts.forEach(p=>{const card=document.createElement('div');card.classList.add('feed-card');card.innerHTML=`<img src="${p.img}"><p>${p.desc}</p>`;slider.appendChild(card);});
+    feedContainer.appendChild(catDiv);
+  });
+}
+
+// SOUVENIRS
+const souvenirsData=[
+  {img:"https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2?auto=format&fit=crop&w=400&q=80",rating:4},
+  {img:"https://images.unsplash.com/photo-1603046891833-449d5cdbf3a5?auto=format&fit=crop&w=400&q=80",rating:5}
+];
+function loadSouvenirs(){
+  const container=document.getElementById('souvenirs');container.innerHTML="";
+  souvenirsData.forEach(s=>{
+    const card=document.createElement('div');card.classList.add('souvenir-card');
+    card.innerHTML=`<img src="${s.img}"><div class="rating">⭐${s.rating}/5</div><div class="recommend">Recommander</div>`;
+    container.appendChild(card);
+    card.querySelector('.recommend').addEventListener('click',()=>{alert("Souvenir recommandé!");});
+  });
+}
+
+// CHAT
+const chatList=document.getElementById('chatList');const messagesDiv=document.getElementById('messages');const chatInput=document.getElementById('chatInput');const sendBtn=document.getElementById('sendBtn');
+let chats=[{name:"Soirée Chill",avatar:"https://via.placeholder.com/35/7ddfff",messages:[]}];
+let activeChat=0;
+function loadChats(){
+  chatList.innerHTML="";
+  chats.forEach((c,i)=>{const item=document.createElement('div');item.classList.add('chat-item');item.innerHTML=`<img src="${c.avatar}"><span>${c.name}</span>`;chatList.appendChild(item);
+  item.addEventListener('click',()=>{activeChat=i;loadMessages();});});
+}
+function loadMessages(){messagesDiv.innerHTML="";chats[activeChat].messages.forEach(m=>{const msg=document.createElement('div');msg.classList.add('message',m.user?"user-msg":"bot-msg");msg.innerText=m.text;messagesDiv.appendChild(msg);});messagesDiv.scrollTop=messagesDiv.scrollHeight;}
+sendBtn.addEventListener('click',()=>{if(chatInput.value.trim()==='')return;const msg={user:true,text:chatInput.value};chats[activeChat].messages.push(msg);loadMessages();chatInput.value='';const botMsg={user:false,text:"Message reçu!"};setTimeout(()=>{chats[activeChat].messages.push(botMsg);loadMessages();},400);});
+
+// PROFILE
+function loadProfile(){const gallery=document.querySelector('#profile .gallery');gallery.innerHTML="";souvenirsData.forEach(s=>{const img=document.createElement('img');img.src=s.img;gallery.appendChild(img);});}
+</script>
+</body>
+</html>
