@@ -1,0 +1,38 @@
+/* BADGES: style app */
+.badgeOpt{
+  background: linear-gradient(90deg, var(--violet), var(--violet-dark));
+  color: #041018;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight:600;
+  cursor:pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.badgeOpt:hover{
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(164,93,255,0.45);
+}
+
+/* QUIZ: boutons style app */
+#quizContent .btn{
+  background: linear-gradient(90deg, var(--violet), var(--violet-dark));
+  color: #041018;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin:6px 6px 0 0;
+  font-weight:600;
+  cursor:pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+#quizContent .btn:hover{
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(164,93,255,0.45);
+}
+
+/* Quiz bouton “Suivant” uniquement visible dans l’onglet Quiz */
+#quizNext{
+  display:block;
+}
+section:not(#quiz) #quizNext{
+  display:none;
+}

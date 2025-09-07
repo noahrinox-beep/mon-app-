@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Project X</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- PWA manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+
 <style>
 :root{
   --bg-1:#050006; --bg-2:#0b0026; --violet:#a45dff; --violet-dark:#6a11cb;
@@ -348,6 +353,13 @@ document.getElementById('publishParty').addEventListener('click',()=>{
   else{ categories.find(c=>c.name===cat).posts.push({img:'https://source.unsplash.com/600x400/?party',title:name,desc:desc}); renderFeed(); createPartyModal.classList.remove('show'); }
 });
 });
+</script>
+
+<!-- PWA Service Worker -->
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
 </script>
 </body>
 </html>
