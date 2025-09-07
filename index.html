@@ -4,6 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Project X</title>
+
+<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
 <!-- PWA manifest -->
@@ -86,6 +88,7 @@ section{ display:none; } section.active{ display:block; }
 @media (max-width:520px){ .card{ min-width:160px } .chat-window{ height:280px } }
 </style>
 </head>
+
 <body>
 <div class="animated-bg" aria-hidden="true"></div>
 <header><h1>Project X</h1></header>
@@ -142,8 +145,8 @@ section{ display:none; } section.active{ display:block; }
     </div>
   </div>
 </section>
-
 </main>
+
 <nav role="navigation" aria-label="Main navigation">
   <button data-section="home" class="active">🏠 Accueil</button>
   <button data-section="souvenirs">📸 Souvenirs</button>
@@ -152,7 +155,7 @@ section{ display:none; } section.active{ display:block; }
   <button data-section="quiz">❓ Quiz</button>
 </nav>
 
-<!-- MODALS -->
+<!-- MODALS et scripts -->
 <div class="modal" id="loginModal" aria-hidden="true">
   <div class="modal-dialog" role="dialog" aria-modal="true">
     <div class="modal-title">Bienvenue !</div>
@@ -162,7 +165,6 @@ section{ display:none; } section.active{ display:block; }
   </div>
 </div>
 
-<!-- CREATE PARTY -->
 <div class="modal" id="createPartyModal" aria-hidden="true">
   <div class="modal-dialog" role="dialog" aria-modal="true">
     <div class="modal-title">Créer une soirée</div>
@@ -179,7 +181,6 @@ section{ display:none; } section.active{ display:block; }
   </div>
 </div>
 
-<!-- BADGES -->
 <div class="modal" id="badgeModal" aria-hidden="true">
   <div class="modal-dialog" role="dialog" aria-modal="true">
     <div class="modal-title">Choisir un badge</div>
@@ -228,8 +229,7 @@ navBtns.forEach(btn=>btn.addEventListener('click',()=>{
 const categories=[
   {name:'Electro',row:document.getElementById('electroRow'),posts:[
     {img:'https://images.unsplash.com/photo-1598514983332-773da6dc3b84?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-4.0.3&q=80&w=600',
-     title:'Electro Night',desc:'Lieu: Le Club Neon, Organisateur: DJ Max, Ambiance: Électro en folie'}
-    ,
+     title:'Electro Night',desc:'Lieu: Le Club Neon, Organisateur: DJ Max, Ambiance: Électro en folie'},
     {img:'https://images.unsplash.com/photo-1602080751520-6aa7cf0e2ab9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600',
      title:'Rave Session',desc:'Lieu: Warehouse Party, Organisateur: EDM Crew, Ambiance: Rave et LED'}
   ]},
@@ -247,10 +247,7 @@ function renderFeed(){
     cat.row.innerHTML='';
     cat.posts.forEach((p,i)=>{
       const card=document.createElement('div'); card.className='card';
-      card.innerHTML=`
-        <img src="${p.img}" alt="${p.title}">
-        <div class="card-overlay"><strong>${p.title}</strong><br>${p.desc}</div>
-      `;
+      card.innerHTML=`<img src="${p.img}" alt="${p.title}"><div class="card-overlay"><strong>${p.title}</strong><br>${p.desc}</div>`;
       card.addEventListener('click',()=>{
         const chatName=`${cat.name} — ${p.title}`;
         if(!chats[chatName]) chats[chatName]=[{text:p.desc,type:'received'}];
@@ -353,13 +350,6 @@ document.getElementById('publishParty').addEventListener('click',()=>{
   else{ categories.find(c=>c.name===cat).posts.push({img:'https://source.unsplash.com/600x400/?party',title:name,desc:desc}); renderFeed(); createPartyModal.classList.remove('show'); }
 });
 });
-</script>
-
-<!-- PWA Service Worker -->
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
 </script>
 </body>
 </html>
