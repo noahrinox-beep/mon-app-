@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Project X</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- PWA manifest -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+
+<style>
+:root{
+  --bg-1:#050006; --bg-2:#0b0026; --violet:#a45dff; --violet-dark:#6a11cb;
+  --muted:rgba(255,255,255,0.65); --card:#0f0f14;
+}
+*{box-sizing:border-box} html,body{height:100%} body{
+  margin:0; font-family:'Montserrat',system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+  color:#fff; background:#000; -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale; overflow:hidden;
+}
+.animated-bg{position:fixed;inset:0;z-index:-1;
+  background: linear-gradient(-45deg, var(--bg-1), var(--bg-2), #1b0033, #0b0026);
+  background-size: 300% 300%; animation: gradientShift 30s ease infinite;
+  filter: saturate(1.1) contrast(1.02);
+}
+@keyframes gradientShift {0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+header{height:72px;display:flex;align-items:center;justify-content:center;
+  backdrop-filter: blur(6px); background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.15));
+  border-bottom:1px solid rgba(255,255,255,0.03); position:relative; z-index:20;
+}
+header h1{font-size:18px; letter-spacing:1px; color:var(--violet)}
+main{position:absolute; inset:72px 0 84px 0; overflow:auto; padding:20px 18px;-webkit-overflow-scrolling:touch;}
+nav{position:fixed; left:50%; transform:translateX(-50%);
+  bottom:16px; z-index:21; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  display:flex; gap:14px; padding:8px 18px; border-radius:999px; align-items:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+nav button{background:transparent;border:0;color:var(--muted);font-size:20px;cursor:pointer;padding:6px;
+  transition:transform .18s ease, color .18s ease;}
+nav button.active{ transform:scale(1.18); color:var(--violet) }
+section{ display:none; } section.active{ display:block; }
+.category{ margin-bottom:22px }
+.category h2{ font-size:16px; color:var(--violet); margin:0 0 10px 0; font-weight:600 }
+.row{ display:flex; gap:12px; overflow-x:auto; padding-bottom:10px; }
+.row::-webkit-scrollbar{ height:8px }
+.card{ min-width:200px; height:140px; border-radius:12px; overflow:hidden; cursor:pointer;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6); transition: transform .2s ease;
+  position:relative;
+}
+.card img{ width:100%; height:100%; object-fit:cover; display:block; }
+.card:hover{ transform:translateY(-6px) scale(1.02); }
+.card-overlay{ position:absolute; inset:0; background: rgba(0,0,0,0.55); color:#fff; padding:8px; display:flex; flex-direction:column; justify-content:flex-end; border-radius:12px; font-size:12px; }
+.chat-list{ margin-bottom:12px; display:flex; flex-direction:column; gap:8px }
+.chat-btn{ background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:10px; padding:10px; border:1px solid rgba(255,255,255,0.02); color:var(--muted);
+  text-align:left; cursor:pointer;}
+.chat-window{ background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+  border-radius:12px; padding:12px; display:flex; flex-direction:column; height:360px;
+}
+#chatMessages{ flex:1; overflow:auto; padding:6px; display:flex; flex-direction:column; gap:8px }
+.msg{ display:inline-block; max-width:72%; padding:10px 12px; border-radius:18px; font-size:14px; line-height:1.2;
+  box-shadow:0 6px 18px rgba(0,0,0,0.5);
+}
+.msg.sent{ align-self:flex-end; background:linear-gradient(90deg,var(--violet),var(--violet-dark)); color:#041018; border-bottom-right-radius:6px; }
+.msg.received{ align-self:flex-start; background:rgba(255,255,255,0.04); color:#e8e8ff; border-bottom-left-radius:6px; }
+.chat-controls{ display:flex; gap:8px; margin-top:8px }
+.chat-controls input{ flex:1; padding:10px 12px; border-radius:10px; border:0; background:#0b0b0f; color:#fff }
+.chat-controls button{ padding:10px 12px; border-radius:10px; border:0; background:linear-gradient(90deg,var(--violet),var(--violet-dark)); color:#041018; cursor:pointer }
+.gallery{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; margin-top:12px }
+.gallery img{ width:100%; height:100px; object-fit:cover; border-radius:10px; display:block }
+.btn{ padding:10px 12px; border-radius:10px; border:0; background:linear-gradient(90deg,var(--violet),var(--violet-dark)); color:#041018; cursor:pointer }
+.profile-header{ text-align:center; margin-bottom:12px; display:flex; flex-direction:column; align-items:center; gap:10px }
+.profile-header img{ width:96px; height:96px; object-fit:cover; border-radius:50%; border:3px solid rgba(164,93,255,0.14) }
+.badges{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:6px }
+.badge-pill{ background:linear-gradient(90deg,var(--violet),var(--violet-dark)); color:#041018; padding:6px 10px; border-radius:999px; font-weight:600 }
+.modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:60 }
+.modal.show{ display:flex }
+.modal-dialog{ width:92%; max-width:480px; background:linear-gradient(180deg,#0b0b0f,#14101a); border-radius:12px; padding:18px; box-shadow:0 18px 60px rgba(0,0,0,0.6); position:relative; }
+.modal-title{ color:var(--violet); font-weight:700; font-size:18px; margin-bottom:12px; text-align:center }
+.modal .close{ position:absolute; right:12px; top:10px; cursor:pointer; color:#bfc6ff; font-size:18px }
+.modal input, .modal select, .modal textarea{ width:100%; padding:10px 12px; border-radius:10px; border:0; background:#0b0b11; color:#fff; margin-bottom:10px }
+.modal .primary{ width:100%; padding:12px; border-radius:10px; border:0; background:linear-gradient(90deg,var(--violet),var(--violet-dark)); color:#041018; cursor:pointer; font-weight:700 }
+@media (max-width:520px){ .card{ min-width:160px } .chat-window{ height:280px } }
+</style>
+</head>
+
+<body>
+<div class="animated-bg" aria-hidden="true"></div>
+<header><h1>Project X</h1></header>
+<main>
+<!-- HOME -->
+<section id="home" class="active">
+  <div class="category"><h2>Electro</h2><div class="row" id="electroRow"></div></div>
+  <div class="category"><h2>House</h2><div class="row" id="houseRow"></div></div>
+  <div class="category"><h2>Soirées Chill</h2><div class="row" id="chillRow"></div></div>
+</section>
+
+<!-- SOUVENIRS -->
+<section id="souvenirs">
+  <button id="addSouvenirBtn" class="btn">+ Ajouter un souvenir</button>
+  <input id="souvenirInput" type="file" accept="image/*" multiple style="display:none" />
+  <div class="gallery" id="souvenirGallery"></div>
+</section>
+
+<!-- CHAT -->
+<section id="chat">
+  <div class="chat-list" id="chatList"></div>
+  <div class="chat-window" id="chatWindow" aria-live="polite">
+    <div id="chatMessages"></div>
+    <div class="chat-controls">
+      <input id="chatInput" placeholder="Écris ton message..." />
+      <button id="sendBtn">Envoyer</button>
+    </div>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section id="profile">
+  <div class="profile-header">
+    <img id="profilePic" src="https://source.unsplash.com/300x300/?portrait" alt="Profil">
+    <div style="display:flex;gap:8px">
+      <button id="uploadProfilePicBtn" class="btn">Changer photo</button>
+      <input id="profilePicInput" type="file" accept="image/*" style="display:none" />
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="createPartyBtn" class="btn">+ Créer une soirée</button>
+      <button id="openBadgeBtn" class="btn">🎖 Choisir badge</button>
+    </div>
+  </div>
+  <div class="badges" id="badgesContainer"></div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+  <div class="modal-dialog">
+    <div class="modal-title">Quiz</div>
+    <div id="quizContent"></div>
+    <div style="margin-top:8px">
+      <button id="quizNext" class="primary">Suivant</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<nav role="navigation" aria-label="Main navigation">
+  <button data-section="home" class="active">🏠 Accueil</button>
+  <button data-section="souvenirs">📸 Souvenirs</button>
+  <button data-section="chat">💬 Chat</button>
+  <button data-section="profile">👤 Profil</button>
+  <button data-section="quiz">❓ Quiz</button>
+</nav>
+
+<!-- MODALS et scripts -->
+<div class="modal" id="loginModal" aria-hidden="true">
+  <div class="modal-dialog" role="dialog" aria-modal="true">
+    <div class="modal-title">Bienvenue !</div>
+    <input id="loginPseudo" placeholder="Ton pseudo" />
+    <input id="loginAge" type="number" placeholder="Ton âge" />
+    <button class="primary" id="loginBtn">Entrer</button>
+  </div>
+</div>
+
+<div class="modal" id="createPartyModal" aria-hidden="true">
+  <div class="modal-dialog" role="dialog" aria-modal="true">
+    <div class="modal-title">Créer une soirée</div>
+    <button class="close" id="closeCreate">✕</button>
+    <input id="partyName" placeholder="Nom de la soirée" />
+    <select id="partyCategory">
+      <option>Electro</option>
+      <option>House</option>
+      <option>Chill</option>
+    </select>
+    <input id="partyMedia" type="file" accept="image/*,video/*" multiple />
+    <textarea id="partyDesc" placeholder="Description..."></textarea>
+    <button class="primary" id="publishParty">Publier la soirée</button>
+  </div>
+</div>
+
+<div class="modal" id="badgeModal" aria-hidden="true">
+  <div class="modal-dialog" role="dialog" aria-modal="true">
+    <div class="modal-title">Choisir un badge</div>
+    <button class="close" id="closeBadge">✕</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button class="badgeOpt" data-badge="🔥 Fêtard">🔥 Fêtard</button>
+      <button class="badgeOpt" data-badge="🎶 DJ">🎶 DJ</button>
+      <button class="badgeOpt" data-badge="🍹 Chill">🍹 Chill</button>
+      <button class="badgeOpt" data-badge="😂 Comique">😂 Comique</button>
+      <button class="badgeOpt" data-badge="📸 Photographe">📸 Photographe</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+// ===== LOGIN =====
+const loginModal=document.getElementById('loginModal');
+const loginPseudo=document.getElementById('loginPseudo');
+const loginAge=document.getElementById('loginAge');
+const loginBtn=document.getElementById('loginBtn');
+let currentUser=null;
+if(localStorage.getItem('pseudo') && localStorage.getItem('age')){
+  currentUser={pseudo:localStorage.getItem('pseudo'),age:localStorage.getItem('age')};
+}else loginModal.classList.add('show');
+loginBtn.addEventListener('click',()=>{
+  const pseudo=loginPseudo.value.trim(); const age=parseInt(loginAge.value);
+  if(!pseudo||!age){alert("Pseudo et âge requis !");return;}
+  currentUser={pseudo,age};
+  localStorage.setItem('pseudo',pseudo); localStorage.setItem('age',age);
+  loginModal.classList.remove('show');
+});
+
+// ===== NAVIGATION =====
+const sections=document.querySelectorAll('main section');
+const navBtns=document.querySelectorAll('nav button');
+navBtns.forEach(btn=>btn.addEventListener('click',()=>{
+  const target=btn.dataset.section;
+  sections.forEach(s=>s.classList.remove('active'));
+  document.getElementById(target).classList.add('active');
+  navBtns.forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}));
+
+// ===== FEED =====
+const categories=[
+  {name:'Electro',row:document.getElementById('electroRow'),posts:[
+    {img:'https://images.unsplash.com/photo-1598514983332-773da6dc3b84?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-4.0.3&q=80&w=600',
+     title:'Electro Night',desc:'Lieu: Le Club Neon, Organisateur: DJ Max, Ambiance: Électro en folie'},
+    {img:'https://images.unsplash.com/photo-1602080751520-6aa7cf0e2ab9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600',
+     title:'Rave Session',desc:'Lieu: Warehouse Party, Organisateur: EDM Crew, Ambiance: Rave et LED'}
+  ]},
+  {name:'House',row:document.getElementById('houseRow'),posts:[
+    {img:'https://images.unsplash.com/photo-1543791187-c53cbe6ed3da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600',
+     title:'House Beats',desc:'Lieu: Le Loft, Organisateur: House Lovers, Ambiance: Chill et rythmé'}
+  ]},
+  {name:'Chill',row:document.getElementById('chillRow'),posts:[
+    {img:'https://images.unsplash.com/photo-1531058020387-3be344556be6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600',
+     title:'Soirée Chill',desc:'Lieu: Rooftop Zen, Organisateur: Chill Team, Ambiance: Relax et lumineuse'}
+  ]}
+];
+function renderFeed(){
+  categories.forEach(cat=>{
+    cat.row.innerHTML='';
+    cat.posts.forEach((p,i)=>{
+      const card=document.createElement('div'); card.className='card';
+      card.innerHTML=`<img src="${p.img}" alt="${p.title}"><div class="card-overlay"><strong>${p.title}</strong><br>${p.desc}</div>`;
+      card.addEventListener('click',()=>{
+        const chatName=`${cat.name} — ${p.title}`;
+        if(!chats[chatName]) chats[chatName]=[{text:p.desc,type:'received'}];
+        activeChat=chatName; renderChatList(); renderMessages();
+        document.querySelector('nav button[data-section="chat"]').click();
+      });
+      cat.row.appendChild(card);
+    });
+  });
+}
+renderFeed();
+
+// ===== CHAT =====
+let chats={};
+let activeChat=null;
+const chatList=document.getElementById('chatList');
+const chatMessages=document.getElementById('chatMessages');
+const chatInput=document.getElementById('chatInput');
+const sendBtn=document.getElementById('sendBtn');
+function renderChatList(){
+  chatList.innerHTML='';
+  Object.keys(chats).forEach(c=>{
+    const btn=document.createElement('button'); btn.className='chat-btn';
+    btn.textContent=c;
+    btn.addEventListener('click',()=>{ activeChat=c; renderMessages(); });
+    chatList.appendChild(btn);
+  });
+}
+function renderMessages(){
+  if(!activeChat) return;
+  chatMessages.innerHTML='';
+  chats[activeChat].forEach(m=>{
+    const div=document.createElement('div'); div.className='msg '+m.type; div.textContent=m.text;
+    chatMessages.appendChild(div);
+  });
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+}
+sendBtn.addEventListener('click',()=>{
+  const txt=chatInput.value.trim(); if(!txt || !activeChat) return;
+  chats[activeChat].push({text:txt,type:'sent'}); chatInput.value='';
+  renderMessages();
+});
+
+// ===== SOUVENIRS =====
+const addSouvenirBtn=document.getElementById('addSouvenirBtn');
+const souvenirInput=document.getElementById('souvenirInput');
+const souvenirGallery=document.getElementById('souvenirGallery');
+addSouvenirBtn.addEventListener('click',()=>souvenirInput.click());
+souvenirInput.addEventListener('change',(e)=>{
+  Array.from(e.target.files).forEach(f=>{
+    const reader=new FileReader();
+    reader.onload=(ev)=>{
+      const img=document.createElement('img'); img.src=ev.target.result; souvenirGallery.appendChild(img);
+    };
+    reader.readAsDataURL(f);
+  });
+});
+
+// ===== PROFILE =====
+const uploadProfilePicBtn=document.getElementById('uploadProfilePicBtn');
+const profilePicInput=document.getElementById('profilePicInput');
+const profilePic=document.getElementById('profilePic');
+uploadProfilePicBtn.addEventListener('click',()=>profilePicInput.click());
+profilePicInput.addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=(ev)=>profilePic.src=ev.target.result;
+  reader.readAsDataURL(file);
+});
+
+// ===== BADGES =====
+const badgeModal=document.getElementById('badgeModal');
+document.getElementById('openBadgeBtn').addEventListener('click',()=>badgeModal.classList.add('show'));
+document.getElementById('closeBadge').addEventListener('click',()=>badgeModal.classList.remove('show'));
+document.querySelectorAll('.badgeOpt').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const b=document.createElement('div'); b.className='badge-pill'; b.textContent=btn.dataset.badge;
+    document.getElementById('badgesContainer').appendChild(b);
+    badgeModal.classList.remove('show');
+  });
+});
+
+// ===== CREATE PARTY =====
+const createPartyModal=document.getElementById('createPartyModal');
+document.getElementById('createPartyBtn').addEventListener('click',()=>createPartyModal.classList.add('show'));
+document.getElementById('closeCreate').addEventListener('click',()=>createPartyModal.classList.remove('show'));
+document.getElementById('publishParty').addEventListener('click',()=>{
+  const name=document.getElementById('partyName').value.trim();
+  const cat=document.getElementById('partyCategory').value;
+  const desc=document.getElementById('partyDesc').value.trim();
+  const imgInput=document.getElementById('partyMedia');
+  if(!name||!desc){alert('Nom et description requis !');return;}
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    categories.find(c=>c.name===cat).posts.push({img:ev.target.result,title:name,desc:desc});
+    renderFeed();
+    createPartyModal.classList.remove('show');
+  };
+  if(imgInput.files[0]) reader.readAsDataURL(imgInput.files[0]);
+  else{ categories.find(c=>c.name===cat).posts.push({img:'https://source.unsplash.com/600x400/?party',title:name,desc:desc}); renderFeed(); createPartyModal.classList.remove('show'); }
+});
+});
+</script>
+</body>
+</html>
